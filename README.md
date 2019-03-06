@@ -16,7 +16,9 @@ vanilla RNN: GloVe Word Embedding -> Average Pooling ->  RNN -> Linear -> sigmoi
 LSTM: GloVe Word Embedding -> Average Pooling ->  LSTM -> Linear -> sigmoid -> logistic loss
 
 ## How to run:
-open a teminal and:
+### Downloading GloVe into the file folder [DownLoad GloVe](https://nlp.stanford.edu/projects/glove/)
+
+### open a teminal and:
 ```shell
 python3 textClassification.py
 ```
