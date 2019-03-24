@@ -26,22 +26,25 @@ def main():
     word_to_idx = make_words_dict(train_sen, val_sen, test_sen, unlab_sen)
 
     ''' generating vector for bag of words '''
-    #train_vec = make_bow_vector(train_sen, word_to_idx)
-    #val_vec = make_bow_vector(val_sen, word_to_idx)
-    #test_vec = make_bow_vector(test_sen, word_to_idx)
-    #unlab_vec = make_bow_vector(unlab_sen, word_to_idx)
+    train_vec = make_bow_vector(train_sen, word_to_idx)
+    val_vec = make_bow_vector(val_sen, word_to_idx)
+    test_vec = make_bow_vector(test_sen, word_to_idx)
+    unlab_vec = make_bow_vector(unlab_sen, word_to_idx)
 
     ''' generating vector for words embedding'''
-    emb_train_vec = make_embed_vector(train_sen, word_to_idx)
-    emb_val_vec = make_embed_vector(val_sen, word_to_idx)
-    emb_test_vec = make_embed_vector(test_sen, word_to_idx)
-    emb_unlab_vec = make_embed_vector(unlab_sen, word_to_idx)
+    max_length = find_max_length(train_sen, val_sen, test_sen, unlab_sen)
+    emb_train_vec = make_embed_vector(train_sen, word_to_idx, max_length)
+    emb_val_vec = make_embed_vector(val_sen, word_to_idx, max_length)
+    emb_test_vec = make_embed_vector(test_sen, word_to_idx, max_length)
+    emb_unlab_vec = make_embed_vector(unlab_sen, word_to_idx, max_length)
     
     #bagOfWordClassification(device, train_vec, val_vec, test_vec, unlab_vec, train_lab, val_lab, test_lab)
     #wordEmbeddingClassificationLearned(device, emb_train_vec, emb_val_vec, emb_test_vec, emb_unlab_vec, train_lab, val_lab, test_lab, word_to_idx)
-    weights_mat = gloVeLoader('glove/glove.6B.50d.txt', word_to_idx)
+    #weights_mat = gloVeLoader('glove/glove.6B.50d.txt', word_to_idx)
     #wordEmbeddingClassificationPretrained(device, emb_train_vec, emb_val_vec, emb_test_vec, emb_unlab_vec, train_lab, val_lab, test_lab, word_to_idx, weights_mat)
     #vanillaRNN(device, emb_train_vec, emb_val_vec, emb_test_vec, emb_unlab_vec, train_lab, val_lab, test_lab, word_to_idx, weights_mat)
-    lstm(device, emb_train_vec, emb_val_vec, emb_test_vec, emb_unlab_vec, train_lab, val_lab, test_lab, word_to_idx, weights_mat)
+    #lstm(device, emb_train_vec, emb_val_vec, emb_test_vec, emb_unlab_vec, train_lab, val_lab, test_lab, word_to_idx, weights_mat)
+    cnn(device, emb_train_vec, emb_val_vec, emb_test_vec, emb_unlab_vec, train_lab, val_lab, test_lab, word_to_idx, max_length)
+
 if __name__ == "__main__":
     main()

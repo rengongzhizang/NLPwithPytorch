@@ -72,3 +72,23 @@ class LSTM(nn.Module):
         embed = self.embedding(x.long())# batch 100, x \in 15 * 100
         scores,_ = self.lstm(embed)# 100, 15 * hidden_size
         return self.sigmoid(self.linear(scores.mean(dim=1)))
+
+class CNN(nn.Module):
+    def __init__(self, vocab_size, embed_dim, max_length, output_cha=128, kernel=5, hidden_size=1, max_pooling=True):
+        super(CNN, self).__init__()
+        self.max_pooling = max_pooling
+        self.embedding = nn.Embedding(vocab_size, embed_dim, padding_idx=0)
+        self.conv1d = nn.Conv1d(max_length, output_cha, kernel)
+        self.relu = nn.ReLU()
+        self.linear = nn.Linear(output_cha, hidden_size)
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, x):
+        embed = self.embedding(x.long())
+        conv = self.conv1d(embed)
+        pooled = None
+        if self.max_pooling:
+            pooled, _ = conv.max(dim=2)
+        else:
+            pooled = conv.mean(dim=2)
+        return self.sigmoid(self.linear(self.relu(pooled)))

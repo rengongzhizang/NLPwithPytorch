@@ -26,8 +26,13 @@ def make_bow_vector(sentence, word_to_ix):
             vec[i][word_to_ix[word]] += 1
     return vec
 
-def make_embed_vector(sentence, word_to_ix):
+def find_max_length(train_sen, val_sen, test_sen, unlab_sen): # find the maximum sentence length through all data set
     max_length = 0
+    for i in train_sen + val_sen + test_sen + unlab_sen:
+        max_length = max(max_length, len(i))
+    return max_length
+
+def make_embed_vector(sentence, word_to_ix, max_length):
     for line in sentence:
         max_length = max(max_length, len(line))
 
@@ -170,6 +175,47 @@ def wordEmbeddingClassificationLearned(device, train_vec, val_vec, test_vec, unl
     trained_net = train_eval(device, net, loss_fn, optimizer, train_loader, val_loader)
     test(device, trained_net, test_loader)
     generator(device, trained_net, unlab_loader, 'data/wordEmbeddingClassificationLearnedPrediction.txt')
+
+def cnn(device, train_vec, val_vec, test_vec, unlab_vec, train_lab, val_lab, test_lab, word_to_ix, max_length):
+    train_data = CNNDataset(train_vec, train_lab)
+    val_data = CNNDataset(val_vec, val_lab)
+    test_data = CNNDataset(test_vec, test_lab)
+    unlab_data = CNNDataset(unlab_vec, [0 for i in unlab_vec])
+
+    train_loader = torch.utils.data.DataLoader(train_data, batch_size=100, shuffle=True)
+    val_loader = torch.utils.data.DataLoader(val_data, batch_size=100, shuffle=True)
+    test_loader = torch.utils.data.DataLoader(test_data, batch_size=100, shuffle=True)
+    unlab_loader = torch.utils.data.DataLoader(unlab_data, batch_size=100, shuffle=False)
+
+    netAveragePoolingKernelSize5 = CNN(len(word_to_ix), 50, max_length, max_pooling=False)
+    loss_fn = nn.BCELoss()
+    optimizer = optim.Adam(netAveragePoolingKernelSize5.parameters(), lr=0.001)
+    trained_net_average_pooling = train_eval(device, netAveragePoolingKernelSize5, loss_fn, optimizer, train_loader, val_loader)
+    test(device, trained_net_average_pooling, test_loader)
+    generator(device, trained_net_average_pooling, unlab_loader, 'data/CNNKernelSize5AveragePooling.txt')
+
+    netAveragePoolingKernelSize7 = CNN(len(word_to_ix), 50, max_length, kernel=7, max_pooling=False)
+    loss_fn = nn.BCELoss()
+    optimizer = optim.Adam(netAveragePoolingKernelSize7.parameters(), lr=0.001)
+    trained_net_average_pooling = train_eval(device, netAveragePoolingKernelSize7, loss_fn, optimizer, train_loader, val_loader)
+    test(device, trained_net_average_pooling, test_loader)
+    generator(device, trained_net_average_pooling, unlab_loader, 'data/CNNKernelSize7AveragePooling.txt')
+
+    netMaxPoolingKernelSize5 = CNN(len(word_to_ix), 50, max_length)
+    loss_fn = nn.BCELoss()
+    optimizer = optim.Adam(netMaxPoolingKernelSize5.parameters(), lr=0.001)
+    trained_net_max_pooling = train_eval(device, netMaxPoolingKernelSize5, loss_fn, optimizer, train_loader, val_loader)
+    test(device, trained_net_max_pooling, test_loader)
+    generator(device, trained_net_max_pooling, unlab_loader, 'data/CNNKernelSize5MaxPooling.txt')
+
+    netMaxPoolingKernelSize7 = CNN(len(word_to_ix), 50, max_length, kernel=7)
+    loss_fn = nn.BCELoss()
+    optimizer = optim.Adam(netMaxPoolingKernelSize7.parameters(), lr=0.001)
+    trained_net_max_pooling = train_eval(device, netMaxPoolingKernelSize7, loss_fn, optimizer, train_loader, val_loader)
+    test(device, trained_net_max_pooling, test_loader)
+    generator(device, trained_net_max_pooling, unlab_loader, 'data/CNNKernelSize7MaxPooling.txt')
+
+
 
 def wordEmbeddingClassificationPretrained(device, train_vec, val_vec, test_vec, unlab_vec, train_lab, val_lab, test_lab, word_to_ix, weights_mat):
     train_data = WordEmbeddingPretrainedDataset(train_vec, train_lab)

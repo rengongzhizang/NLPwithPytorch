@@ -76,3 +76,17 @@ class LSTMDataset(Dataset):
 
     def __len__(self):
         return self.count
+
+class CNNDataset(Dataset):
+    def __init__(self, vec, label, transforms=None):
+        self.transforms = transforms
+        self.vec = vec
+        self.label = torch.tensor(label, dtype=torch.float).view(-1)
+        self.count = len(label)
+
+    def __getitem__(self, index):
+        sample = (self.vec[index,:], self.label[index])
+        return sample
+
+    def __len__(self):
+        return self.count
